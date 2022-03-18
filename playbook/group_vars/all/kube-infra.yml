@@ -77,15 +77,13 @@ postgres_shared_instance_name: postgres-shared
 mysql_shared_instance_name: mysql-shared
 
 #######################
-#      Kube IAM      #
+#      Kube IAM       #
 #######################
 
-# Domain
-authentik_domain: auth.mbcaas.com
+user_manager_domain: usr.mbcaas.com
 
-# Charts url
-authenthik_chart_url: https://charts.goauthentik.io
-
+ldap_admin_password:  password
+ldap_config_password: password
 
 #######################
 #   User / Password   #

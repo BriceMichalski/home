@@ -8,29 +8,35 @@
     state: present
     wait: true
 
-- name: Install Authentik
-  block: 
-    
-    - name: Install authentik repository
-      kubernetes.core.helm_repository:
-        name: authentik
-        repo_url: "{{ authenthik_chart_url }}"
+- name: Install open ldap
+  block:
 
-    - name: Create authentik database
+    - name: Install openldap repos
+      kubernetes.core.helm_repository:
+        name: helm-openldap
+        repo_url: https://jp-gouin.github.io/helm-openldap/
+
+    - name: Deploy ldap-credential secret
       kubernetes.core.k8s:
         state: present
         apply: yes
-        wait: yes
-        definition: "{{ lookup('template', 'database.yml.j2') }}"
+        definition: "{{ lookup('template', 'ldapSecret.yml.j2') }}"
 
-    - name: Install authentik
+    - name: Install openldap
       kubernetes.core.helm:
-        name: authentik
-        chart_ref: authentik/authentik
+        name: openldap
+        chart_ref: helm-openldap/openldap-stack-ha
         release_namespace: "{{ kube_iam_namespace }}"
-        values: "{{ lookup('template', 'values.yml.j2') | from_yaml }}"
+        values: "{{ lookup('template', 'openldap.yml.j2') | from_yaml }}"
         wait: yes
-  
+
+    - name: deploy ui
+      vars:
+        app: "{{ ldap_user_manager }}"
+      import_role:
+        name: roles/kube-apps
+        tasks_from: custom
+
   tags:
     - kubernetes
     - kubernetes::iam

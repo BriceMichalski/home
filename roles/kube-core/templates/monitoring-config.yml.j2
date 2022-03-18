@@ -26,7 +26,6 @@ grafana:
       traefik.ingress.kubernetes.io/router.middlewares: "{{ 'common' | to_traefik_middleware }}"
       external-dns.alpha.kubernetes.io/target: {{ cloudflare_record_target }}
       cert-manager.io/cluster-issuer: letsencrypt
-      kubernetes.io/ingress.class: traefik
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
     hosts:
       - "{{ grafana_domain }}"
