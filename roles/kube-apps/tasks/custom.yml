@@ -19,7 +19,7 @@
         state: present
         apply: yes
         definition: "{{ lookup('template', 'custom/pvc.yml.j2') }}"
-      when: app.pvc | default(false)
+      when: app.claim | default(false)
 
     - name: "{{ app.name | upper }} CREATE | k8s deployment"
       kubernetes.core.k8s:

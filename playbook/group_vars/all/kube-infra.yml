@@ -80,7 +80,9 @@ mysql_shared_instance_name: mysql-shared
 #      Kube IAM       #
 #######################
 
-user_manager_domain: usr.mbcaas.com
+user_manager_domain: user.mbcaas.com
+ldap_admin_domain: ldap.mbcaas.com
+
 
 ldap_admin_password:  password
 ldap_config_password: password

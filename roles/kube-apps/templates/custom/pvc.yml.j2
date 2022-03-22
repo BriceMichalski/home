@@ -10,4 +10,6 @@ spec:
   resources:
     requests:
       storage: "{{ app.claim.size }}"
-  storageClassName: azurefile-standard-lrs
+{% if app.claim.className is defined%}
+  storageClassName: {{ app.claim.className }}
+{% endif %}

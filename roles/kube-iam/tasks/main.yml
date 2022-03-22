@@ -30,9 +30,9 @@
         values: "{{ lookup('template', 'openldap.yml.j2') | from_yaml }}"
         wait: yes
 
-    - name: deploy ui
+    - name: Deploy ldap_account_manager
       vars:
-        app: "{{ ldap_user_manager }}"
+        app: "{{ ldap_account_manager }}"
       import_role:
         name: roles/kube-apps
         tasks_from: custom
@@ -40,3 +40,30 @@
   tags:
     - kubernetes
     - kubernetes::iam
+
+
+# - name: Install open ldap
+#   block:
+
+#     - name: Install openldap repos
+#       kubernetes.core.helm_repository:
+#         name: helm-openldap
+#         repo_url: https://jp-gouin.github.io/helm-openldap/
+
+#     - name: Deploy ldap-credential secret
+#       kubernetes.core.k8s:
+#         state: present
+#         apply: yes
+#         definition: "{{ lookup('template', 'ldapSecret.yml.j2') }}"
+
+#     - name: Install openldap
+#       kubernetes.core.helm:
+#         name: openldap
+#         chart_ref: helm-openldap/openldap-stack-ha
+#         release_namespace: "{{ kube_iam_namespace }}"
+#         values: "{{ lookup('template', 'openldap.yml.j2') | from_yaml }}"
+#         wait: yes
+
+#   tags:
+#     - kubernetes
+#     - kubernetes::iam

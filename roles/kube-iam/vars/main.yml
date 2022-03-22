@@ -1,0 +1,94 @@
+---
+ldap_account_manager:
+  deployed: true
+
+  #
+  # Meta
+  #
+  name: ldap-account-manager
+  namespace: "{{ kube_iam_namespace }}"
+
+  #
+  # Middleware
+  #
+  traefik_middleware: "common"
+
+  # claim:
+  #   name: config-storage-claim
+  #   size: 500Mi
+  #   modes:
+  #     - ReadWriteOnce
+  #
+  # App
+  #
+  pod_volumes: []
+    # - name: config-storage
+    #   persistentVolumeClaim:
+    #     claimName: config-storage-claim
+
+  containers:
+    - name: ldap-account-manager
+      image: ldapaccountmanager/lam:7.8
+      ports:
+        - containerPort: 80
+      # volumeMounts:
+      #   - mountPath: "/var/lib/ldap-account-manager/config"
+      #     name: config-storage
+      env:
+        - name: DEBUG
+          value: "true"
+        - name: LAM_SKIP_PRECONFIGURE
+          value: "false"
+        - name: LDAP_DOMAIN
+          value: "mbcaas.com"
+        - name: LDAP_BASE_DN
+          value: "dc=mbcaas,dc=com"
+        - name: LDAP_USERS_DN
+          value: "ou=people,dc=mbcaas,dc=com"
+        - name: LDAP_GROUPS_DN
+          value: "ou=groups,dc=mbcaas,dc=com"
+        - name: LDAP_SERVER
+          value: "ldap://openldap-openldap-stack-ha"
+        - name: LDAP_USER
+          value: "cn=admin,dc=mbcaas,dc=com"
+        - name: LAM_LANG
+          value: "fr_FR"
+        - name: LAM_DISABLE_TLS_CHECK
+          value: "true"
+        - name: LDAP_ORGANISATION
+          value: "MBCaaS"
+
+        - name: LDAP_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ldap-credential
+              key: LDAP_ADMIN_PASSWORD
+
+        - name: LAM_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ldap-credential
+              key: LDAP_ADMIN_PASSWORD
+
+  service_ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: http
+
+  tls:
+    - hosts:
+        - "{{ user_manager_domain }}"
+      secretName: "{{ user_manager_domain }}-tls"
+
+  ingress_rules:
+    - host: "{{ user_manager_domain }}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ldap-account-manager
+                port:
+                  number: 80
